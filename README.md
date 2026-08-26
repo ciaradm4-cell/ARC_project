@@ -1,6 +1,20 @@
-# QUB ARC Project - Mapping the transient sky with NGTS
-The Next Generation Transit Survey  is a ground-based telescope based at the Paranal Observatory in Chile who's primary function is to search for transiting exoplanets. With it's high photometric precision and cadence of 13 seconds, the NGTS facility provides a unique opportunity to study transient phenomena in great detail. 
+# QUB ARC Project — Mapping the Transient Sky with NGTS
 
-The main function of this work is to produce high-coverage lightcurves for transient objects observed by NGTS using its archival data. The download file (wget_pp.py), which uses parallel processing, grabs the raw images from NGTS, and the photometry pipeline used is outlined in phot_pipeline_withfuncs.py. Additionally, the functions.py file explicitly contains the functions used in the photometry pipeline. 
+## Overview
+The Next Generation Transit Survey (NGTS) is a ground-based telescope at the 
+Paranal Observatory in Chile, whose primary function is to search for transiting 
+exoplanets. With its high photometric precision and a cadence of 13 seconds, 
+NGTS provides a unique opportunity to study transient phenomena in detail.
 
-(Note that while the photometry runs correctly, the plotting within this file is poor and generally manual inspection in a seperate file is necessary to obtain clear lightcurves centered about the explosion.)
+This project aims to produce high-coverage lightcurves for transient objects observed 
+by NGTS, using its archival data.
+
+## Files
+- `wget_pp.py` — downloads raw images from NGTS archival data using parallel processing
+- `phot_pipeline_withfuncs.py` — the main photometry pipeline
+- `functions.py` — contains the functions used by the photometry pipeline
+
+## Notes
+While the photometry runs correctly, the plotting within `phot_pipeline_withfuncs.py` 
+is currently poor. Manual inspection in a separate file is generally needed to 
+obtain good lightcurves about the explosion epoch of the transient.
