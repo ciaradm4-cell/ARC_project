@@ -117,7 +117,10 @@ def action_photometry(action, source_id, x, y, field_name, campaign_name):     #
             row[f'{source_id[i]}_flux_err'] = fluxerr[i]
             row[f'{source_id[i]}_flag'] = flag[i]
 
-        filename = f'test_results/{field_name}/{campaign_name}/{field_name}_{campaign_name}_{action_id}_discmag_test.csv'
+        results_dir = f'test_results/{field_name}/{campaign_name}'
+        os.makedirs(results_dir, exist_ok=True)
+
+        filename = f'{results_dir}/{field_name}_{campaign_name}_{action_id}_discmag_test.csv'
         row.to_csv(filename, mode='a', header=not os.path.exists(filename), index=False)
     
     return filename
@@ -142,7 +145,10 @@ def concatenate_actions(actions, field_name, campaign_name):
     # making a master dataframe for the entire campaign within a field by concatenating all of the individual action files
     full_df = pd.concat(dfs, ignore_index=True)
     full_df = full_df.sort_values('MJD').reset_index(drop=True)    # making sure they are in order of time in case things get mixed up 
-    full_df.to_csv(f'test_results/{field_name}/{campaign_name}/{field_name}_{campaign_name}_discmag_test_full.csv', index=False)       # converting it to a csv
+
+    results_dir = f'test_results/{field_name}/{campaign_name}'
+    os.makedirs(results_dir, exist_ok=True)
+    full_df.to_csv(f'{results_dir}/{field_name}_{campaign_name}_discmag_test_full.csv', index=False)       # converting it to a csv
 
     return full_df 
 
@@ -158,7 +164,10 @@ def plot_lightcurve(obj, flux_data, field_name, campaign_name):
     plt.ylabel('Flux')
     #plt.axvline(disc_mjd, color='red', linestyle='--', label='Discovery MJD')
     plt.legend()
-    plt.savefig(f'lightcurves/{field_name}/{campaign_name}/{obj}_discmag_test_lightcurve_notnorm.png')
+
+    lc_dir = f'lightcurves/{field_name}/{campaign_name}'
+    os.makedirs(lc_dir, exist_ok=True)
+    plt.savefig(f'{lc_dir}/{obj}_discmag_test_lightcurve_notnorm.png')
     plt.show()
 
 
@@ -237,7 +246,10 @@ def plot_compnorm_lc(mjd, corrected_flux, disc_mjd, obj, field_name, campaign_na
     plt.ylabel('Median normalised flux')
     plt.axvline(disc_mjd, color='red', linestyle='--', label='Discovery MJD')
     plt.legend()
-    plt.savefig(f'lightcurves/{field_name}/{campaign_name}/{obj}_discmag_test_compnorm_lc.png', dpi=200, bbox_inches='tight')
+
+    lc_dir = f'lightcurves/{field_name}/{campaign_name}'
+    os.makedirs(lc_dir, exist_ok=True)
+    plt.savefig(f'{lc_dir}/{obj}_discmag_test_compnorm_lc.png', dpi=200, bbox_inches='tight')
     plt.show()
 
 def plot_binned_lc(mjd, corrected_flux, disc_mjd, obj, field_name, campaign_name):
@@ -256,6 +268,9 @@ def plot_binned_lc(mjd, corrected_flux, disc_mjd, obj, field_name, campaign_name
     plt.ylabel('Median normalised flux')
     plt.axvline(disc_mjd, color='red', linestyle='--', label='Discovery MJD')
     plt.legend()
-    plt.savefig(f'lightcurves/{field_name}/{campaign_name}/{obj}_discmag_test_binned_lc.png', dpi=200, bbox_inches='tight')
+
+    lc_dir = f'lightcurves/{field_name}/{campaign_name}'
+    os.makedirs(lc_dir, exist_ok=True)
+    plt.savefig(f'{lc_dir}/{obj}_discmag_test_binned_lc.png', dpi=200, bbox_inches='tight')
     plt.show()
         
