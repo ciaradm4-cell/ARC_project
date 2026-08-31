@@ -6,19 +6,22 @@ import os
 # quick thrown together script for parallel downloadind with wget. 
 # I've made it so this is easily callable froma terminal.
 
-# example run command for a txt file and asking for 2 cores. 
-# python wget_pp.py url_test_file.txt -n 2
-def download(url):
+# example run command for a txt file and asking for 2 cores, saving into a chosen folder.
+# python wget_pp.py url_test_file.txt -n 2 -o /path/to/output -u myusername -p mypassword
+
+
+def download(args):
+    url, output_dir, user, password = args
 
     action = url.split("/")[-2]
 
-    directory = os.path.join("NGTS/images/NG2251+0000/80220170508091134", action)
+    directory = os.path.join(output_dir, action)
     os.makedirs(directory, exist_ok=True)
 
     filename = url.split("/")[-1]
 
     cmd = (
-        f'curl -u "CeiraDeasyMiller:Yukidog7" '
+        f'curl -u "{user}:{password}" '
         f'-o "{directory}/{filename}" '
         f'"{url}" '
         f'-f -s'
@@ -61,6 +64,31 @@ def main():
         default=1,
         required=False,
     )
+    optional.add_argument(
+        "-o",
+        "--output-dir",
+        help="Base directory to save downloaded files into.",
+        dest="output_dir",
+        type=str,
+        default=".",
+        required=False,
+    )
+    optional.add_argument(
+        "-u",
+        "--username",
+        help="Username for downloading files.",
+        dest="user",
+        type=str,
+        required=True,
+    )
+    optional.add_argument(
+        "-p",
+        "--password",
+        help="Password for downloading files.",
+        dest="password",
+        type=str,
+        required=True,
+    )
 
     args = parser.parse_args()
 
@@ -77,9 +105,11 @@ def execute(args):
 
     num_workers = args.n  # number of cores you want to use. command line argument -n
 
+    tasks = [(url, args.output_dir, args.user, args.password) for url in urls]
+
     with multiprocessing.Pool(processes=num_workers) as pool:
         # spreads urls accross the cores and downloads them. each core is in a loop with a given chunk of urls
-        results = pool.map(download, urls)
+        results = pool.map(download, tasks)
 
     # incase some files fail to run I've added this to recored what files need downloaded still
     failed = [url for url, code in results if code != 0]
