@@ -42,7 +42,7 @@ def parse_args():
     optional.add_argument(
         "-n",
         "--num-workers",
-        help="Number of CPUs to use for parallel photometry.",
+        help="Number of cores to use for parallel photometry.",
         dest="num_workers",
         type=int,
         default=4,
