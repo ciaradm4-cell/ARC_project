@@ -26,7 +26,7 @@ def field_info(field_name, campaign_name):
     # load in all relevant files 
     actions = glob(f'images/{field_name}/{campaign_name}/action*/', recursive=True)    # list of all actions - PRINT THIS AND CHECK
     df_fields_obs = pd.read_csv('fields_and_observing_times_corrected.csv')    # crossmatch file
-    df_comp = pd.read_csv(f'field_info/{field_name}/{field_name}_discmag_comparison_stars.csv')    # the comparison stars file for this campaign/subdirectory
+    df_comp = pd.read_csv(f'field_info/{field_name}/{field_name}_comparison_stars.csv')    # the comparison stars file for this campaign/subdirectory
 
     # on a per field basis, picking out the field of the campaign and extracting the ra and decs aswell as names of the objects that could be observed 
     candidates = df_fields_obs[(df_fields_obs['field_name'] == field_name)]
@@ -117,10 +117,10 @@ def action_photometry(action, source_id, x, y, field_name, campaign_name):     #
             row[f'{source_id[i]}_flux_err'] = fluxerr[i]
             row[f'{source_id[i]}_flag'] = flag[i]
 
-        results_dir = f'test_results/{field_name}/{campaign_name}'
+        results_dir = f'results/{field_name}/{campaign_name}'
         os.makedirs(results_dir, exist_ok=True)
 
-        filename = f'{results_dir}/{field_name}_{campaign_name}_{action_id}_discmag_test.csv'
+        filename = f'{results_dir}/{field_name}_{campaign_name}_{action_id}.csv'
         row.to_csv(filename, mode='a', header=not os.path.exists(filename), index=False)
     
     return filename
@@ -135,7 +135,7 @@ def concatenate_actions(actions, field_name, campaign_name):
     for action in actions:
 
         action_id = int(action.split('/')[-2].split('_')[0].replace('action', ''))      # getting action id again
-        filename = f'test_results/{field_name}/{campaign_name}/{field_name}_{campaign_name}_{action_id}_discmag_test.csv'      # defining the name of the files
+        filename = f'results/{field_name}/{campaign_name}/{field_name}_{campaign_name}_{action_id}.csv'      # defining the name of the files
 
         if os.path.exists(filename):    # if an observations file exists for this action, add it to the dataframe containing the file names
             dfs.append(pd.read_csv(filename))
@@ -146,9 +146,9 @@ def concatenate_actions(actions, field_name, campaign_name):
     full_df = pd.concat(dfs, ignore_index=True)
     full_df = full_df.sort_values('MJD').reset_index(drop=True)    # making sure they are in order of time in case things get mixed up 
 
-    results_dir = f'test_results/{field_name}/{campaign_name}'
+    results_dir = f'results/{field_name}/{campaign_name}'
     os.makedirs(results_dir, exist_ok=True)
-    full_df.to_csv(f'{results_dir}/{field_name}_{campaign_name}_discmag_test_full.csv', index=False)       # converting it to a csv
+    full_df.to_csv(f'{results_dir}/{field_name}_{campaign_name}_full.csv', index=False)       # converting it to a csv
 
     return full_df 
 
@@ -167,16 +167,16 @@ def plot_lightcurve(obj, flux_data, field_name, campaign_name):
 
     lc_dir = f'lightcurves/{field_name}/{campaign_name}'
     os.makedirs(lc_dir, exist_ok=True)
-    plt.savefig(f'{lc_dir}/{obj}_discmag_test_lightcurve_notnorm.png')
+    plt.savefig(f'{lc_dir}/{obj}_lightcurve_notnorm.png')
     plt.show()
 
 
 # would have another function here that plots the comparison star normalised light curve
 def comp_norm(obj, field_name, campaign_name): 
 
-    df = pd.read_csv(f'test_results/{field_name}/{campaign_name}/{field_name}_{campaign_name}_discmag_test_full.csv')
+    df = pd.read_csv(f'results/{field_name}/{campaign_name}/{field_name}_{campaign_name}_full.csv')
     df_fields_obs = pd.read_csv('fields_and_observing_times_corrected.csv')
-    comp_df = pd.read_csv(f'field_info/{field_name}/{field_name}_discmag_comparison_stars.csv')
+    comp_df = pd.read_csv(f'field_info/{field_name}/{field_name}_comparison_stars.csv')
     
     mjd = df['MJD']
     row = df_fields_obs[(df_fields_obs['field_name'] == field_name)]
@@ -249,7 +249,7 @@ def plot_compnorm_lc(mjd, corrected_flux, disc_mjd, obj, field_name, campaign_na
 
     lc_dir = f'lightcurves/{field_name}/{campaign_name}'
     os.makedirs(lc_dir, exist_ok=True)
-    plt.savefig(f'{lc_dir}/{obj}_discmag_test_compnorm_lc.png', dpi=200, bbox_inches='tight')
+    plt.savefig(f'{lc_dir}/{obj}_compnorm_lc.png', dpi=200, bbox_inches='tight')
     plt.show()
 
 def plot_binned_lc(mjd, corrected_flux, disc_mjd, obj, field_name, campaign_name):
@@ -271,6 +271,6 @@ def plot_binned_lc(mjd, corrected_flux, disc_mjd, obj, field_name, campaign_name
 
     lc_dir = f'lightcurves/{field_name}/{campaign_name}'
     os.makedirs(lc_dir, exist_ok=True)
-    plt.savefig(f'{lc_dir}/{obj}_discmag_test_binned_lc.png', dpi=200, bbox_inches='tight')
+    plt.savefig(f'{lc_dir}/{obj}_binned_lc.png', dpi=200, bbox_inches='tight')
     plt.show()
         
