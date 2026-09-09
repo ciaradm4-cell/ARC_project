@@ -1,4 +1,3 @@
-
 from functions import field_info, action_photometry, plot_lightcurve, concatenate_actions, comp_norm, plot_compnorm_lc, plot_binned_lc
 import matplotlib.pyplot as plt 
 from astropy.io import fits
@@ -7,6 +6,7 @@ import multiprocessing
 from glob import glob 
 import pandas as pd
 import numpy as np
+import functools
 import argparse
 import warnings
 import sep 
@@ -51,6 +51,9 @@ def parse_args():
  
     return parser.parse_args()
 
+def worker(action, source_id, x, y, field_name, campaign_name):
+    return action_photometry(action, source_id=source_id, x=x, y=y, field_name=field_name, campaign_name=campaign_name)
+
 def main():
  args = parse_args()
   
@@ -64,14 +67,11 @@ def main():
  # get necessary information about field and objects  (list of all actions, source names, and their xy positions)
  actions, obj_names, source_id, x, y = field_info(field_name, campaign_name)
  
- # allows for the worker to have just one varyiing argument which is the action and keeps the rest const (fills the other 5 arguments the same each time)
- def worker(action):
-     return action_photometry(action, source_id=source_id, x=x, y=y, field_name=field_name, campaign_name=campaign_name)
- 
  # splits the actions list across num_workers processes which each calls worker(action)
+ worker_fn = functools.partial(worker, source_id=source_id, x=x, y=y, field_name=field_name, campaign_name=campaign_name)
+
  with multiprocessing.Pool(processes=num_workers) as pool:
-     pool.map(worker, actions)   # worker is the function called to work on a given action which is given from the list of actions supplied
- 
+     pool.map(worker_fn, actions)
  field_campaign_flux_data = concatenate_actions(actions, field_name, campaign_name)     # returns the dataframe of flux data for the entire field campaign
  
  # plots raw and corrected light curve for each candidate object (visually inspect these to see which ones are actual objects)
