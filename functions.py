@@ -64,6 +64,11 @@ def action_photometry(action, source_id, x, y, field_name, campaign_name):     #
 
     # reshaping the files so that we can properly bin them
     new_shape = [int(files.shape[0]/n_frames), n_frames]
+ 
+    if new_shape[0] == 0:
+        print(f'Skipping {action}: not enough frames after trimming to make a stack ({files.shape[0]} left)')
+        return None
+     
     files = files.reshape(new_shape)
 
     # need to check how this works within a function...
@@ -74,10 +79,8 @@ def action_photometry(action, source_id, x, y, field_name, campaign_name):     #
     for i in range(files.shape[0]):     # for each stack, runs this loop
 
         mjd = np.zeros(n_frames)    # mjd of stack is the median of the timestamps of the stack
-
+        first = 0 
         for j in range(n_frames):
-            first = 0 
-
             #for every 6 frames, call each image, do bias subtraction, and add them together
 
             try:
